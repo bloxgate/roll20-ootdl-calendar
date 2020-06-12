@@ -1,5 +1,7 @@
 # OotDL Calendar for Roll20
 
+A calendar script for DerErlenkonig#9462's Odyssey calendar, usable on Roll20's API
+
 ## Commands
 
 `!cal`
