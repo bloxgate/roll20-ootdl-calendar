@@ -2,8 +2,8 @@ plugins {
     id 'org.jetbrains.kotlin.js' version '1.3.72'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'me.gmaddra'
+version 'a1.5'
 
 repositories {
     mavenCentral()

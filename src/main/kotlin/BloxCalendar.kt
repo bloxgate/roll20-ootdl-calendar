@@ -3,13 +3,14 @@ import kotlin.js.json
 
 external fun on(event: String, func: Function<Unit>)
 external fun log(message: Any)
+external fun playerIsGM(playerid: String): Boolean
 
 //Chat Functions
 external fun sendChat(speakingAs: String, input: String, callback: Function<Unit>? = definedExternally, options: Json? = definedExternally)
 
 fun main(args: Array<String>) {
     on("ready", {
-        log("Bloxgate's Odyssey of the Dragonlords Calendar v1.0 starting up!")
+        log("Bloxgate's Odyssey of the Dragonlords Calendar v${BloxCalendar.VERSION} starting up!")
         if(!state.hasOwnProperty("BloxCalendarState") || state.BloxCalendarState["version"].toString() != BloxCalendar.VERSION)
         {
             state.BloxCalendarState = json(
@@ -30,7 +31,7 @@ fun main(args: Array<String>) {
         if(msg["type"].toString() == "api" && msg["content"].toString().indexOf("!cal") != -1)
         {
             //sendChat("Calendar", "Test Message", null, null)
-            BloxCalendar.handleChat(msg["content"].toString().split(' '), msg["who"].toString())
+            BloxCalendar.handleChat(msg["content"].toString().split(' '), msg["who"].toString(), msg["playerid"].toString())
         }
     })
 }
@@ -163,20 +164,35 @@ object BloxCalendar {
         sendChat("Calendar Bot", msg.toString(), null, json("noarchive" to true))
     }
 
-    fun handleChat(content: List<String>, author: String)
+    fun handleChat(content: List<String>, author: String, playerid: String)
     {
         if(content.size == 1)
         {
             sendChat("Calendar Bot", "It is now ${computeWeekdayName(curDay)}, ${computeDayOfMonth(curDay)} ${curMonth.name}, $curYear CE",
                 null, json("noarchive" to true))
         } else {
+            val isGM = playerIsGM(playerid)
             when(content[1])
             {
                 "advance" -> {
-                    advanceCalendar(content[2].toInt())
+                    if(isGM)
+                    {
+                        val days = content.getOrNull(2)?.toInt() ?: 0
+                        advanceCalendar(days)
+                        sendChat("Calendar Bot", "/w gm Calendar advanced $days days")
+                    } else {
+                        sendChat("Calendar Bot", "/w $author You must be the GM to do that!", null, json("noarchive" to true))
+                    }
                 }
                 "reduce" -> {
-                    reduceCalendar(content[2].toInt())
+                    if(isGM)
+                    {
+                        val days = content.getOrNull(2)?.toInt() ?: 0
+                        reduceCalendar(days)
+                        sendChat("Calendar Bot", "/w gm Calendar reduced $days days")
+                    } else {
+                        sendChat("Calenar Bot", "/w $author You must be the GM to do that!", null, json("noarchive" to true))
+                    }
                 }
                 "month" -> {
                     printMonth(curMonth)
