@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: ./gradlew build
+    - name: combine scripts
+      run: |
+        cat build/js/packages_imported/kotlin/1.3.72/kotlin.js > ootdl-calendar.js
+        cat build/js/packages/roll20-ootdl-calendar/kotlin/roll20-ootdl-calendar.js >> ootdl-calendar.js
+    - name: upload script
+      uses: actions/upload-artifact@v2
+      if: ${{ github.event_name == 'push' }}
+      with:
+        name: ootdl-calendar
+        path: ootdl-calendar.js
