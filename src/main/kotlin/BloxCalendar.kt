@@ -197,6 +197,9 @@ object BloxCalendar {
                 "month" -> {
                     printMonth(curMonth)
                 }
+                "year" -> {
+                    Month.values().forEach { printMonth(it) }
+                }
             }
         }
     }
